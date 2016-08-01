@@ -11,30 +11,48 @@
 
 // add the label element to your div
 //document.getElementById('list').appendChild(label);
-   var i = 0;
-    function addValue() {
-       var v = document.form1.txtValue.value;
-       // get the TextBox Value and assign it into the variable
-       AddOpt = new Option(v, v);
-       document.form1.lstValue.options[i++] = AddOpt;
-       return true;
-    }
-    function deleteValue() {
-       var s = 1;
-       var Index;
-       if (document.form1.lstValue.selectedIndex == -1) {
-          alert("Please select any item from the ListBox");
-          return true;
-       }
-       while (s > 0) {
-           Index = document.form1.lstValue.selectedIndex;
-           if (Index >= 0) {
-                document.form1.lstValue.options[Index] = null;
-                 --i;
-           }
-           else
-              s = 0;
-       }
-       return true;
-   }
-       
+var clientId = 'client';
+var apiKey = 'jTWy6Utn`ouoZ3a';
+var scopes = 'profile email https://www.googleapis.com/auth/drive.readonly';
+
+var signinButton = document.getElementById('signin-button');
+var signoutButton = document.getElementById('signout-button');
+
+function initAuth() {
+  gapi.client.setApiKey(apiKey);
+  gapi.auth2.init({
+      client_id: clientId,
+      scope: scopes
+  }).then(function () {
+    // Listen for sign-in state changes.
+    gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+    // Handle the initial sign-in state.
+    updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+
+    signinButton.addEventListener("click", handleSigninClick);
+    signoutButton.addEventListener("click", handleSignoutClick);
+  });
+}
+
+function updateSigninStatus(isSignedIn) {
+  if (isSignedIn) {
+    signinButton.style.display = 'none';
+    signoutButton.style.display = 'block';
+    makeApiCall();
+  } else {
+    signinButton.style.display = 'block';
+    signoutButton.style.display = 'none';
+  }
+}
+
+function handleSigninClick(event) {
+  gapi.auth2.getAuthInstance().signIn();
+}
+
+function handleSignoutClick(event) {
+  gapi.auth2.getAuthInstance().signOut();
+}
+
+// Load the API client and auth library
+gapi.load('client:auth2', initAuth);

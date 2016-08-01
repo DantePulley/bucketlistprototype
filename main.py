@@ -17,12 +17,26 @@
 import webapp2
 import jinja2
 
-env= jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
+
+env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
 
 class MainHandler(webapp2.RequestHandler):
+    
     def get(self):
-    	bucketlistproto_template= env.get_template('bucketlistproto.html')
-    	self.response.out.write(bucketlistproto_template.render())
+        main_template = env.get_template('bucketlistproto.html')
+        self.response.out.write(main_template.render())
+    def post(self): ## here's the new POST method in the MainHandler
+        results_template = env.get_template('newr.html')
+        
+        # the variables that are sent to results.html are user_answer_1 and user_answer_2
+        # they contain the input values from the main.html form with names answer1 and answer2
+        template_variables = {
+            'noun1':self.request.get("noun1"),
+            'password':self.request.get("password"),
+            'email':self.request.get("email"),
+           
+            }
+        self.response.out.write(results_template.render(template_variables))
         
 
 app = webapp2.WSGIApplication([
